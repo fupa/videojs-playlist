@@ -30,19 +30,22 @@ export default class PlaylistPlugin extends Plugin {
 
     this.playlist_ = null;
     this.autoAdvance_ = null;
+    this.loadSource_ = null;
   }
 
   /**
    * Loads a playlist and sets up related functionality.
    *
    * @param {Playlist} playlist - The playlist to load.
+   * @param {Function | undefined} loadSource - The playlist to load.
    */
-  loadPlaylist(playlist) {
+  loadPlaylist(playlist, loadSource = null) {
     // Clean up any existing playlist
     this.unloadPlaylist();
 
     this.playlist_ = playlist;
-    this.autoAdvance_ = new AutoAdvance(this.player, this.playNext_);
+    this.loadSource_ = loadSource;
+    this.autoAdvance_ = new AutoAdvance(this.player, this.playNext_, loadSource);
 
     this.setupEventForwarding_();
 
@@ -61,6 +64,10 @@ export default class PlaylistPlugin extends Plugin {
 
     if (this.autoAdvance_) {
       this.autoAdvance_.fullReset();
+    }
+
+    if (this.loadSource_) {
+      this.loadSource_ = null;
     }
 
     // Stop handling non-playlist source changes
@@ -184,7 +191,11 @@ export default class PlaylistPlugin extends Plugin {
     this.clearExistingItemTextTracks_();
 
     this.player.poster(loadPoster ? item.poster : '');
-    this.player.src(item.sources);
+    if (this.loadSource_) {
+      this.loadSource_(item.sources);
+    } else {
+      this.player.src(item.sources);
+    }
 
     this.player.ready(() => {
       this.addItemTextTracks_(item);
