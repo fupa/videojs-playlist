@@ -1,7 +1,7 @@
 import videojs from 'video.js';
 import Playlist from './playlist.js';
 import AutoAdvance from './auto-advance.js';
-import { isIndexInBounds } from './utils.js';
+import {doesIndexExceedUpperBound, isIndexInBounds} from './utils.js';
 
 const Plugin = videojs.getPlugin('plugin');
 
@@ -102,6 +102,11 @@ export default class PlaylistPlugin extends Plugin {
    */
   loadPlaylistItem(index, { loadPoster = true } = {}) {
     const items = this.playlist_.get();
+
+    if (doesIndexExceedUpperBound(items, index)) {
+      this.player.trigger('playlistended');
+      return false;
+    }
 
     if (!isIndexInBounds(items, index)) {
       log.error('Index is out of bounds.');

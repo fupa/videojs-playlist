@@ -10,6 +10,17 @@ export const isIndexInBounds = (array, index) => {
 };
 
 /**
+ * Checks if the given index exceeds the upper bound of the array.
+ *
+ * @param {Array} array - The array to check against.
+ * @param {number} index - The index to verify.
+ * @return {boolean} - Returns true if the index is a number and is outside the array's upper bound, otherwise false.
+ */
+export const doesIndexExceedUpperBound = (array, index) => {
+    return typeof index === 'number' && index >= array.length;
+  };
+
+/**
  * Randomizes array elements in place.
  *
  * @param {Array} array - The array to shuffle.
